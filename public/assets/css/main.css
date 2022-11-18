@@ -1,0 +1,40 @@
+i {
+    padding: 0 !important;
+}
+
+.btn i {
+    font-size: 1.3rem;
+}
+
+
+.select2-container--bootstrap5 .select2-dropdown {
+    border: 0;
+    /* box-shadow: var(--kt-dropdown-box-shadow); */
+    border-radius: 0.475rem;
+    padding: 1rem 0;
+    background-color: var(--bs-dropdown-bg);
+}
+
+.select2-container--bootstrap5 .select2-dropdown .select2-results__option.select2-results__option--selected {
+    background-color: var(--bs-component-hover-bg);
+    color: var(--bs-component-hover-color);
+    transition: color 0.2s ease;
+    position: relative;
+}
+
+.select2-container--bootstrap5 .select2-dropdown .select2-results__option.select2-results__option--highlighted {
+    background-color: var(--bs-component-hover-bg);
+    color: var(--bs-component-hover-color);
+    transition: color 0.2s ease;
+}
+
+.select2-container--bootstrap5.select2-container--focus .form-select:not(.form-select-solid):not(.form-select-transparent),
+.select2-container--bootstrap5.select2-container--open .form-select:not(.form-select-solid):not(.form-select-transparent) {
+    border-color: var(--bs-form-select-border-color);
+}
+
+
+
+.menu-item .menu-link .menu-icon i {
+    font-size: 1.5rem;
+}
