@@ -13,7 +13,7 @@ class PropertiesRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -30,6 +30,7 @@ class PropertiesRequest extends FormRequest
         $rule = [
             'name' =>  $ruleName,
         ];
+        // dd($rule);
         return $rule;
     }
 }

@@ -2,13 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use App\Models\Banner;
+use App\Models\Product;
 use App\Models\Category;
 use App\Models\CategoryProduct;
 use App\Models\GalleryProducts;
-use App\Models\Product;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,7 +20,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        Product::factory(40)->create();
+        Product::factory(50)->create();
         Category::factory(10)->create();
         $cate  = Category::all();
         Product::all()->each(function ($pro) use ($cate) {
@@ -29,5 +30,6 @@ class DatabaseSeeder extends Seeder
         });
         GalleryProducts::factory(100)->create();
         // Banner::factory(10)->create();
+        User::factory(100)->create();
     }
 }

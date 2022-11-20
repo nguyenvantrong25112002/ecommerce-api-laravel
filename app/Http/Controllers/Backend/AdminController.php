@@ -29,34 +29,13 @@ class AdminController extends Controller
     public function adminGoogleCallback()
     {
         $ggUser = Socialite::driver('google')->user()->user;
-
         $user = User::where(function ($q) use ($ggUser) {
             $q->where('email', $ggUser['email']);
             $q->where('status', config('util.ACTIVE_STATUS'));
             return $q;
-        })->first();
-        // $user = User::where([
-        //     ['email', $ggUser['email']],
-        //     ['status', config('util.ACTIVE_STATUS')]
-        // ])->first();
-        // 
-        // dd($user->hasRole([
-        //     config('util.ROLE_SUPER_ADMIN'),
-        //     config('util.ROLE_ADMIN'),
-        //     config('util.ROLE_STAFF'),
-        //     config('util.ROLE_USER'),
-        // ]));
-        if ($user && $user->hasRole([
-            config('util.ROLE_SUPER_ADMIN'),
-            config('util.ROLE_ADMIN'),
-            config('util.ROLE_STAFF')
-        ])) {
+        })->has('roles')->first();
+        if ($user) {
             auth()->login($user);
-            // if (!session()->has('token')) {
-            //     auth()->user()->tokens()->delete();
-            //     $token = auth()->user()->createToken("token_admin")->plainTextToken;
-            //     session()->put('token', $token);
-            // }
             return redirect()->route('admin.dashboard');
         }
         return redirect()->route('login')->with(config('util.ERROR'), "Tài khoản của bạn không có quyền truy cập!");

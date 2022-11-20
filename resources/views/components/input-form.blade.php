@@ -7,7 +7,7 @@
                     {{ $attr }}
                 @endforeach
             @endisset
-        @if (!empty($value)) value="{{ old($name, $value) }}" @endif name="{{ $name ?? '' }}"
+        value="{{ old($name, $value) }}" name="{{ $name ?? '' }}"
         type="{{ $type }}" class="form-control">
     @error($name)
         <small class="text-danger">{{ $message }}</small>

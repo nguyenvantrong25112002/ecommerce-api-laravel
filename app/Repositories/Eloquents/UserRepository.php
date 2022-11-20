@@ -56,7 +56,8 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     public function searchUser()
     {
         $datas = $this->model->where(function ($q) {
-            $q->search(request()->information ?? null, ['email', 'phone_number']);
+            $q->where('email', request()->information);
+            $q->orWhere('phone_number', request()->information);
             return $q;
         })->doesntHave('roles')->first();
         return $datas;

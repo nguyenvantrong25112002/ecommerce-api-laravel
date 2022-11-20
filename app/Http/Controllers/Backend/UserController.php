@@ -54,6 +54,9 @@ class UserController extends Controller
 
     public function addSaveAdmin(AdminRequest $request)
     {
-        dd($request->all());
+        if ($request->user == 'old') {
+            $data = $this->userRepositoryInterface->searchUser();
+            dd($data->toArray());
+        }
     }
 }

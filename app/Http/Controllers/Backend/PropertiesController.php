@@ -37,6 +37,7 @@ class PropertiesController extends Controller
 
     public function storeProperties(PropertiesRequest $request, Str $str)
     {
+        // dd($request->all());
         $this->db::beginTransaction();
         try {
             $this->propertiesRepo->create([

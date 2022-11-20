@@ -13,7 +13,7 @@
             <form action="{{ route('admin.personnel.add.role.admin.save') }}" method="post">
                 @csrf
                 @method('post')
-               
+
                 <div class="row">
                     <div class="col-lg-12">
 
@@ -106,36 +106,12 @@
                                                     'value' => '',
                                                     'name' => 'information',
                                                     'type' => 'text',
-                                                    // 'attrs' => ['id=information'],
+                                                    'attrs' => ['id=information'],
                                                     'required' => true,
                                                 ])
                                             @endcomponent
                                             <small class="text-danger"></small>
-                                        </div>
 
-                                        <div class="modal fade" id="modalInformation" tabindex="-1" role="dialog"
-                                            aria-labelledby="modalTitleId" aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="modalTitleId">Modal title</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="container-fluid">
-                                                            <div id='userInformation'>
-
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                            data-bs-dismiss="modal">Close</button>
-                                                        <button type="button" class="btn btn-primary">Save</button>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -175,14 +151,13 @@
 @section('page-script')
     <script src="{{ asset('js/system/admin/admin.js') }}"></script>
     <script>
-            var url_search_user = "{{ route('admin.personnel.search') }}"
-            main.resetForm();
-            admin.searchUsersAddAdmin(
-                '#kt_tab_pane_2 input#information',
-                '#kt_tab_pane_2  #modalInformation',
-                url_search_user,
-                '#kt_tab_pane_2  #modalInformation #userInformation',
-            );
-            admin.checkOldNewUser();
+        var url_search_user = "{{ route('admin.personnel.search') }}"
+        main.resetForm();
+        admin.searchUsersAddAdmin(
+            '#kt_tab_pane_2 input#information',
+            url_search_user,
+            '#kt_tab_pane_2  .information',
+        );
+        admin.checkOldNewUser();
     </script>
 @endsection
