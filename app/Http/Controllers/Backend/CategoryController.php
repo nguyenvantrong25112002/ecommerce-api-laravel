@@ -29,12 +29,8 @@ class CategoryController extends Controller
     public function index()
     {
         try {
-            //code...
-            $categorys = $this->categoryRepo->getList([], ['children' => function ($q) {
-                return $q->withCount(['products']);
-            }]);
+            $categorys = $this->categoryRepo->getListAdmin();
         } catch (\Throwable $th) {
-            //throw $th;
             dd($th);
         }
         return view('pages.category.list-category', [

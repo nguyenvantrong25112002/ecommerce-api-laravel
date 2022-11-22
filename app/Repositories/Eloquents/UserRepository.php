@@ -20,14 +20,15 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         ]));
         return $datas;
     }
+
     public function getAllRole()
     {
         return Role::all();
-        // return [
-        //     config('util.ROLE_SUPER_ADMIN'),
-        //     config('util.ROLE_ADMIN'),
-        //     config('util.ROLE_STAFF')
-        // ];
+    }
+
+    public function findRole($id)
+    {
+        return Role::findOrFail($id);
     }
 
     public function getListAdmin()
@@ -53,13 +54,32 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         return $datas;
     }
 
-    public function searchUser()
+    public function whereUserEmailPhone($email = null, $phone = null)
     {
-        $datas = $this->model->where(function ($q) {
-            $q->where('email', request()->information);
-            $q->orWhere('phone_number', request()->information);
+        // dd($email);
+        return $this->model->where(function ($q) use ($email, $phone) {
+            if ($email) $q->where('email', $email);
+            if ($phone && !$email) {
+                $q->where('phone_number', $phone);
+            } else {
+                $q->orWhere('phone_number', $phone);
+            }
             return $q;
-        })->doesntHave('roles')->first();
-        return $datas;
+        });
+    }
+    public function whereUserNotRoleFirst($email = null, $phone = null)
+    {
+        $data = $this->whereUserEmailPhone($email, $phone)->doesntHave('roles')->first();
+        return $data;
+    }
+
+    public function whereEmailFirst($email)
+    {
+        return $this->whereMany(['email' => $email])->first();
+    }
+
+    public function wherePhoneFirst($phone)
+    {
+        return $this->whereMany(['phone_number' => $phone])->first();
     }
 }

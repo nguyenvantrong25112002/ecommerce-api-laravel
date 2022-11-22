@@ -84,6 +84,7 @@ Route::prefix('personnel')->as('personnel.')->controller(UserController::class)-
     Route::get('add',  'addAdmin')->name('add');
     Route::post('add-role-admin',  'addSaveAdmin')->name('add.role.admin.save');
     Route::get('search',  'searchUser')->name('search');
+    Route::post('', 'editRoleAdmin')->name('list.edit.role');
 });
 Route::get('test', function () {
     $files = Storage::disk('public-folder-images')->allFiles();

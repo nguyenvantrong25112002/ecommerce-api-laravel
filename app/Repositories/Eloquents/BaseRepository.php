@@ -4,7 +4,9 @@ namespace App\Repositories\Eloquents;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Repositories\Interfaces\BaseRepositoryInterface;
-
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class BaseRepository implements BaseRepositoryInterface
 {
@@ -16,10 +18,18 @@ class BaseRepository implements BaseRepositoryInterface
         $this->model = $model;
     }
 
-    public function paginate($itemOnPage)
+
+
+    public function paginate($datas, $perPage = 10, $page = null)
     {
-        return $this->model->paginate($itemOnPage);
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $datas = $datas instanceof Collection ? $datas : Collection::make($datas);
+        return new LengthAwarePaginator($datas->forPage($page, $perPage)->values(), $datas->count(), $perPage, $page, [
+            'path' => Paginator::resolveCurrentPath(),
+            'pageName' => 'page',
+        ]);
     }
+
 
     public function getAll()
     {
@@ -31,9 +41,9 @@ class BaseRepository implements BaseRepositoryInterface
         return $this->model->all($columns);
     }
 
-    public function find($id, $columns = ['*'])
+    public function find($id)
     {
-        return $this->model->findOrFail($id, $columns);
+        return $this->model->find($id);
     }
 
     public function findMany($ids, $columns = ['*'])
@@ -84,8 +94,17 @@ class BaseRepository implements BaseRepositoryInterface
         return $this->model->whereSlug($slug)->firstOrFail();
     }
 
-    public function findOrFail($id)
+    public function findOrFail($id, $columns = ['*'])
     {
-        return $this->model->findOrFail($id);
+        return $this->model->findOrFail($id, $columns);
+    }
+
+    public function whereMany($data)
+    {
+        $requests = [];
+        foreach ($data as $key => $v) {
+            array_push($requests, [$key => $v]);
+        }
+        return  $this->model::where([$requests]);
     }
 }

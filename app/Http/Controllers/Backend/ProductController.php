@@ -69,7 +69,7 @@ class ProductController extends Controller
         try {
             $filename =   $this->uploadFile($request->file('image'));
             if (!$filename) {
-                return redirect()->back()->with('error', "Lỗi thêm ảnh !!");
+                return redirect()->back()->with(config('util.ERROR'), "Lỗi thêm ảnh !!");
             }
             $product = $this->productRepo->create([
                 'name' => $request->name,
@@ -88,7 +88,7 @@ class ProductController extends Controller
                 event(new CreateGalleryProductEvent($request->gallerys, $product->id));
             }
             $this->db::commit();
-            return redirect()->route('admin.product.list')->with('success', "Thêm sản phẩm :  $request->name  thành công !!");
+            return redirect()->route('admin.product.list')->with(config('util.SUCCESS'), "Thêm sản phẩm :  $request->name  thành công !!");
         } catch (\Throwable $th) {
             $this->db::rollBack();
             event(new DeleteFileEvent($filename));
@@ -197,20 +197,19 @@ class ProductController extends Controller
                 if ($request->hasFile('image')) {
                     $img = $this->uploadFile($request->file('image'), $product->image);
                     if (!$img) {
-                        return redirect()->back()->with('error', "Lỗi cập nhập ảnh !!");
+                        return redirect()->back()->with(config('util.ERROR'), "Lỗi cập nhập ảnh !!");
                     }
                     $product->image =  $img;
                 }
                 $product->save();
                 $product->categorys()->sync($request->category_id);
                 $this->db::commit();
-                return redirect()->route('admin.product.list')->with('success', 'Cập nhật thành công !!');
+                return redirect()->route('admin.product.list')->with(config('util.SUCCESS'), 'Cập nhật thành công !!');
             } else {
                 return abort(404);
             }
         } catch (\Throwable $th) {
             $this->db::rollBack();
-            //throw $th;
             return abort(500);
         }
     }
@@ -229,12 +228,12 @@ class ProductController extends Controller
                 "properties.*"  => "required|integer",
             ]
         );
-        if ($validator->fails()) return $this->sendResponseError('Lỗi validation', $validator->errors(), Response::HTTP_BAD_REQUEST);
+        if ($validator->fails()) return $this->sendResponseError('Lỗi validation', Response::HTTP_BAD_REQUEST, $validator->errors());
 
         $product = $this->productRepo->find($id_product);
         $product->properties()->sync($request->properties);
         $product->save();
-        return $this->sendResponse('', 'Cập nhập thành công !');
+        return $this->sendResponse(null, 'Cập nhập thành công !');
     }
 
     public function addSpecies(Request $request, $id_product)
@@ -245,11 +244,11 @@ class ProductController extends Controller
                 "species.*"  => "required|integer",
             ]
         );
-        if ($validator->fails()) return $this->sendResponseError('Lỗi validation', $validator->errors(), Response::HTTP_BAD_REQUEST);
+        if ($validator->fails()) return $this->sendResponseError('Lỗi validation', Response::HTTP_BAD_REQUEST, $validator->errors());
         $product = $this->productRepo->find($id_product);
         $product->species()->sync($request->species);
         $product->save();
-        return $this->sendResponse('', 'Cập nhập thành công !');
+        return $this->sendResponse(null, 'Cập nhập thành công !');
     }
 
     public function listSpeciesProduct($id)
