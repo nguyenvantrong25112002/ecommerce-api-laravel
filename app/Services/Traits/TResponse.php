@@ -6,6 +6,9 @@ use Illuminate\Http\Response;
 
 trait TResponse
 {
+    /**
+     * 
+     */
     function responseApi($status = false, $data = "Not found", $dataAppend = [], $code =  Response::HTTP_OK)
     {
         if (!$status) $code = Response::HTTP_NOT_FOUND;
@@ -17,10 +20,17 @@ trait TResponse
             $code
         );
     }
-    function sendResponse($data, $message = '', $code = Response::HTTP_OK)
+
+    /**
+     *  @param  array|object  $data | Dữ liệu
+     *  @param  string  $message | Nội dung thông báo 
+     *  @param  bool  $status | Trạng thái 
+     *  @param  int  $code | HTTP code response 
+     */
+    function sendResponse(array|object $data = null, string $message = null, bool $status = true, int $code = Response::HTTP_OK)
     {
         $response = [
-            'status' => true,
+            'status' => $status,
             'code' => $code,
             'payload' => $data,
         ];
@@ -31,19 +41,19 @@ trait TResponse
     }
 
     /**
-     * return error response.
-     *
-     * @return \Illuminate\Http\Response
+     *  @param  string  $message | Nội dung thông báo 
+     *  @param  int  $code | HTTP code response 
+     * @param  array|object  $dataError | Dữ liệu
      */
-    function sendResponseError($error, $errorMessages = [], $code = Response::HTTP_NOT_FOUND)
+    function sendResponseError(string $message, int $code = Response::HTTP_NOT_FOUND, array|object $dataError = [])
     {
         $response = [
             'status' => false,
             'code' => $code,
-            'message' => $error,
+            'message' => $message,
         ];
-        if (!empty($errorMessages)) {
-            $response['payload'] = $errorMessages;
+        if (!empty($dataError)) {
+            $response['payload'] = $dataError;
         }
         return response()->json($response, $code);
     }

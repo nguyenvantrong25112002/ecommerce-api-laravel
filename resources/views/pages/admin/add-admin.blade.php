@@ -89,6 +89,9 @@
                                             ])
                                         @endcomponent
                                     </div>
+                                    <div class="col-12">
+                                        <x-select-status></x-select-status>
+                                    </div>
                                 </div>
                             </div>
                             <div @class([
@@ -136,7 +139,7 @@
 
                         </div>
 
-                        <x-select-status></x-select-status>
+
                     </div>
                 </div>
                 <div class="mt-5">

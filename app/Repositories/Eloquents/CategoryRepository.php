@@ -7,13 +7,14 @@ use App\Repositories\Interfaces\CategoryRepositoryInterface;
 class CategoryRepository extends BaseRepository implements CategoryRepositoryInterface
 {
 
-    public function getList($request = [], $with = [])
+    public function getListAdmin()
     {
         $data = $this->model::orderBy('id', 'desc')
             ->whereNull('parent_id')
-            ->hasRequest($request)
             ->withCount(['products'])
-            ->with($with)
+            ->with(['children' => function ($q) {
+                return $q->withCount(['products']);
+            }])
             ->paginate(request('limit') ?? 1);
         // $data->makeHidden(['view', 'token', 'description', 'details', 'image', 'quantity']);
         return  $data;

@@ -1,9 +1,54 @@
 const admin = {
-    selectRoles: function (elementSelectRoles) {
+    selectRoles: function (rolesGroupElement, elementSelectRoles, auth_user_id, url_post_role) {
+
+        // $(document).click(elementSelectRoles, function (e) {
+        //     e.preventDefault();
+        //     console.log(this);
+        //     // alert($(this).val())
+        //     // $(this + ' option').hide();
+        // });
         $(document).on('change', elementSelectRoles, function (e) {
             e.preventDefault();
-            alert($(this).val())
+            var user_id = $(this).data('user_id');
+            var val_role_id = $(this).val();
+            if (user_id == auth_user_id) {
+                main.toastr("warning", "Lỗi hệ thống ");
+                return;
+            }
+            $.ajax({
+                type: "post",
+                url: url_post_role,
+                data: {
+                    role_id: val_role_id,
+                    user_id: user_id
+                },
+                success: function (response) {
+                    if (response.code == 200 && response.status == true) {
+                        if (val_role_id == 0) $(`tr#user_id_${user_id}`).remove();
+                        return main.toastr("success", response.message);
+                    }
+                },
+                error: function (params) {
+                    if (params.responseJSON.code == 404) return main.toastr("warning", params.responseJSON.message);
+                }
+
+            });
+            // Swal.fire({
+            //     html: `<span class="h2 text-dark">Bạn có chắc chắn muốn cấp lại quyền cho người này ?</span>`,
+            //     showDenyButton: true,
+            //     showCancelButton: true,
+            //     cancelButtonText: 'Thoát',
+            //     confirmButtonText: 'Đúng vậy.',
+            //     denyButtonText: `Thôi tôi đổi ý !`,
+            // }).then((result) => {
+            //     if (result.isConfirmed) {
+
+            //     } else if (result.isDenied) {
+            //         Swal.fire('Bạn đã hủy cấp quyền !', '', 'info')
+            //     }
+            // })
         });
+
     },
     searchUsersAddAdmin: function (elementInput, urlSearchUser, informationUserEl) {
         function htmlInformationUser(data) {
@@ -70,6 +115,10 @@ const admin = {
         }
         $(elementInput).on('focusout', function (e) {
             var valInput = $(this).val();
+            if (valInput == '' || valInput == null) {
+                $(`${informationUserEl} small.text-danger`).text('Trường này không được bỏ trống.');
+                return;
+            }
             $(`${informationUserEl} small.text-danger`).text('');
             if ($(informationUserEl + ' .user').length > 0) $(informationUserEl + ' .user').remove();
             return searchUserGet(valInput);

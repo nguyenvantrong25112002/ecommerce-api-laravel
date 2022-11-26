@@ -31,8 +31,8 @@ class AdminRequest extends FormRequest
             $rule = array_merge($rule, [
                 'name' => 'required|max:255',
                 'email' => 'required|email',
-                'phone_number' => 'required|integer',
-                'birthday' => 'required|date',
+                'phone_number' => 'required|numeric',
+                // 'birthday' => 'date_format:m/d/Y',
             ]);
         }
         if (request()->user ==  'old') {
