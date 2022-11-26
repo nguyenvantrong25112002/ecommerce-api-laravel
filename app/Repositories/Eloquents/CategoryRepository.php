@@ -19,8 +19,27 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
         // $data->makeHidden(['view', 'token', 'description', 'details', 'image', 'quantity']);
         return  $data;
     }
+
     public function getParent()
     {
         return $this->model->whereNull('parent_id')->with('children')->get();
+    }
+
+    public function getActive()
+    {
+        $data = $this->model::query();
+        $data->orderBy('order', 'desc');
+        $data->where('status', config('util.ACTIVE_STATUS'));
+        return $data;
+    }
+
+    public function getListApi()
+    {
+        $data = $this->getActive();
+        $data->orderBy('order', 'desc');
+        $data->whereNull('parent_id');
+        $data->where('status', config('util.ACTIVE_STATUS'));
+        $data = $data->get();
+        return $data;
     }
 }

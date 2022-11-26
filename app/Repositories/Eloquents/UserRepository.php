@@ -67,6 +67,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
             return $q;
         });
     }
+
     public function whereUserNotRoleFirst($email = null, $phone = null)
     {
         $data = $this->whereUserEmailPhone($email, $phone)->doesntHave('roles')->first();
@@ -81,5 +82,10 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     public function wherePhoneFirst($phone)
     {
         return $this->whereMany(['phone_number' => $phone])->first();
+    }
+
+    public function getAuthSanctum()
+    {
+        return  auth('sanctum')->user();
     }
 }

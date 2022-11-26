@@ -2,25 +2,40 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use App\Http\Controllers\Controller;
-use App\Models\Address\CityProvinces;
-use App\Models\Address\District;
-use App\Models\Address\Ward;
 use App\Models\AddresUser;
+use App\Models\Address\Ward;
 use Illuminate\Http\Request;
+use App\Models\Address\District;
+use App\Models\Address\Provinces;
+use App\Services\Traits\TResponse;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Exceptions\NotFoundApiException;
+use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Repositories\Interfaces\AddresUserRepositoryInterface;
+use App\Repositories\Interfaces\DistrictRepositoryInterface;
+use App\Repositories\Interfaces\ProvincesRepositoryInterface;
+use App\Repositories\Interfaces\WardRepositoryInterface;
 
 class AddresUserController extends Controller
 {
+    use TResponse;
     protected $user;
     protected $addresUserModel;
     protected $cityProvincesModel;
     protected $districtModel;
     protected $wardModel;
     public function __construct(
+        private DB $dB,
         AddresUser $addresUser,
-        CityProvinces $cityProvinces,
+        Provinces $cityProvinces,
         District $district,
-        Ward $ward
+        Ward $ward,
+        private AddresUserRepositoryInterface $addresUserRepositoryInterface,
+        private UserRepositoryInterface $userRepositoryInterface,
+        private WardRepositoryInterface $wardRepositoryInterface,
+        private DistrictRepositoryInterface $districtRepositoryInterface,
+        private ProvincesRepositoryInterface $provincesRepositoryInterface
     ) {
         $this->user = auth('sanctum')->user();
         $this->addresUserModel = $addresUser;
@@ -30,70 +45,76 @@ class AddresUserController extends Controller
     }
     public function index()
     {
-        $user_id = auth('sanctum')->user()->id;
-        $data =  $this->addresUserModel::where('user_id', $user_id)->get();
-        return response()->json([
-            'status' => true,
-            'payload' => $data,
-        ]);
+        $user_id = $this->userRepositoryInterface->getAuthSanctum()->id;
+        $datas =  $this->addresUserRepositoryInterface->getAddresFromUser($user_id);
+        if (count($datas) == 0)  return $this->sendResponseNull();
+        return $this->sendResponse($datas, trans('message.success'));
     }
+
     public function store(Request $request)
     {
-        $status = 0;
-        $addresUser =  $this->addresUserModel::where('user_id', $this->user->id)->get();
-        if (count($addresUser) == 0) {
-            $status = 1;
-        } else {
-            if ($request->status == true) {
-                $this->addresUserModel::where('user_id', $this->user->id)->where('status', config('util.ACTIVE_STATUS'))
-                    ->update([
+        $this->dB::beginTransaction();
+        try {
+            $status = config('util.INACTIVE_STATUS');
+            $user_id = $this->userRepositoryInterface->getAuthSanctum()->id;
+            $addresUser  = $this->addresUserRepositoryInterface->getAddresFromUser($user_id);
+            if (count($addresUser) == 0) {
+                $status = config('util.ACTIVE_STATUS');
+            } else {
+                if ($request->status == true) {
+                    $this->addresUserRepositoryInterface->update([
+                        'user_id' =>  $user_id,
+                        'status' => config('util.ACTIVE_STATUS')
+                    ], [
                         'status' => config('util.INACTIVE_STATUS')
                     ]);
-                $status = 1;
+                    $status = config('util.ACTIVE_STATUS');
+                }
             }
-        }
-
-        try {
-            $this->addresUserModel::create([
-                'user_id' => $this->user->id,
+            $this->addresUserRepositoryInterface->create([
+                'user_id' =>   $user_id,
                 'name' => $request->name,
                 'phone' => $request->phone,
-                'city_province' => $this->cityProvincesModel::find($request->city_province)->name,
-                'district' => $this->districtModel::find($request->district)->name,
-                'ward' =>  $this->wardModel::find($request->ward)->name,
+                'city_province' => $this->provincesRepositoryInterface->find($request->city_province)->full_name,
+                'district' => $this->districtRepositoryInterface->find($request->district)->full_name,
+                'ward' =>  $this->wardRepositoryInterface->find($request->ward)->full_name,
                 'detailed_address' => $request->detailed_address,
                 'status' =>  $status,
             ]);
-            return response()->json([
-                'status' => true,
-                'payload' => 'Thêm địa chỉ đơn hàng thành công !!',
-            ]);
+            $this->dB::commit();
+            return $this->sendResponse(null, trans('message.success'));
         } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'payload' => 'Có lỗi , vui lòng liên hệ quản trị viên !!',
-            ]);
+            $this->dB::rollBack();
+            return $this->sendResponseError(trans('message.error'), 500);
         }
     }
     public function updateActiveDefault(Request $request)
     {
+        $user_id = $this->userRepositoryInterface->getAuthSanctum()->id;
+        $this->dB::beginTransaction();
         try {
-            $this->addresUserModel::where('user_id', $this->user->id)->where('status', config('util.ACTIVE_STATUS'))
-                ->update([
-                    'status' => config('util.INACTIVE_STATUS')
-                ]);
-            $this->addresUserModel::find($request->id)->update([
+            $this->addresUserRepositoryInterface->update([
+                'user_id' =>  $user_id,
                 'status' => config('util.ACTIVE_STATUS')
+            ], [
+                'status' => config('util.INACTIVE_STATUS')
             ]);
-            return response()->json([
-                'status' => true,
-                'payload' => 'Đặt mặc định thành công !!',
-            ]);
+            $this->addresUserRepositoryInterface->updateById([
+                'status' => config('util.ACTIVE_STATUS')
+            ], $request->id);
+            $this->dB::commit();
+            return $this->sendResponse(null, 'Đặt mặc định thành công !!');
         } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'payload' => 'Có lỗi , vui lòng liên hệ quản trị viên !!',
-            ]);
+            $this->dB::rollBack();
+            return $this->sendResponseError(trans('message.error'), 500);
         }
+    }
+
+    public function delete($id)
+    {
+        $data =  $this->addresUserRepositoryInterface->find($id);
+        if (!$data) throw new NotFoundApiException();
+        $data->delete();
+        return $this->sendResponse($data, trans('message.success'));
     }
 }

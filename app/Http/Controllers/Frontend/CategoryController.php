@@ -6,14 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\CateProduct;
 use App\Models\Product;
+use App\Repositories\Interfaces\CategoryRepositoryInterface;
+use App\Services\Traits\TResponse;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    use TResponse;
     private $categoryModel;
     private $productModel;
-    public function __construct(Category $category, Product $product)
-    {
+    public function __construct(
+        Category $category,
+        Product $product,
+        private CategoryRepositoryInterface $categoryRepositoryInterface
+    ) {
         $this->categoryModel = $category;
         $this->productModel = $product;
     }
@@ -26,11 +32,13 @@ class CategoryController extends Controller
     }
     public function getParent()
     {
-        $categorys = $this->queryCategory()->parentCategory()->get();
-        return response()->json([
-            'status' => true,
-            'payload' =>   $categorys,
-        ]);
+        $datas = $this->categoryRepositoryInterface->getListApi();
+        return $this->sendResponse($datas, trans('message.success'));
+        // $categorys = $this->queryCategory()->parentCategory()->get();
+        // return response()->json([
+        //     'status' => true,
+        //     'payload' =>   $categorys,
+        // ]);
     }
     public function getCategoryProduct($slug)
     {

@@ -50,9 +50,9 @@ class AuthController extends Controller
     }
 
 
-    public function fake_login(Request $request)
+    public function fake_login()
     {
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', request()->email)->first();
         if ($user) {
             $token = $user->createToken('authToken')->plainTextToken;
             return response()->json([

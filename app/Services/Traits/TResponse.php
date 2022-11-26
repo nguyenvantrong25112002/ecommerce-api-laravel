@@ -57,4 +57,16 @@ trait TResponse
         }
         return response()->json($response, $code);
     }
+
+
+    function sendResponseNull()
+    {
+        $response = [
+            'status' => false,
+            'code' => Response::HTTP_OK,
+            'message' => trans('message.data_null'),
+            'payload' => null,
+        ];
+        return response()->json($response, Response::HTTP_OK);
+    }
 }

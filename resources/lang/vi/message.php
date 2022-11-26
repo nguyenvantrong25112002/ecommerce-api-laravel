@@ -10,5 +10,7 @@ return [
     'success' => 'Thành công !!',
 
 
-    'not_found' => 'Nội dung không tìm thấy !!'
+    'not_found' => 'Nội dung không tìm thấy !!',
+
+    'data_null' => 'Nội dung trống !!'
 ];

@@ -10,7 +10,8 @@ Route::prefix('address')->group(function () {
     Route::post('ward', [AddressController::class, 'getWard']);
 });
 Route::prefix('address-user')->group(function () {
-    Route::post('add', [AddresUserController::class, 'store']);
     Route::get('list', [AddresUserController::class, 'index']);
+    Route::post('add', [AddresUserController::class, 'store']);
+    Route::delete('delete/{id}', [AddresUserController::class, 'delete']);
     Route::put('update-active-default', [AddresUserController::class, 'updateActiveDefault']);
 });

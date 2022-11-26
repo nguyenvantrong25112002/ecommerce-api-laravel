@@ -3,26 +3,38 @@
 namespace App\Services\Traits;
 
 use App\Models\Address\AdministrativeRegion;
+use App\Models\Address\District;
+use App\Models\Address\Provinces;
+use App\Models\Address\Ward;
+use App\Models\AddresUser;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\GalleryProducts;
 use App\Models\Properties;
 use App\Models\Species;
 use App\Models\User;
+use App\Repositories\Eloquents\AddresUserRepository;
 use App\Repositories\Eloquents\CategoryRepository;
+use App\Repositories\Eloquents\DistrictRepository;
 use App\Repositories\Eloquents\GallerryRepository;
 use App\Repositories\Eloquents\ProductRepository;
 use App\Repositories\Eloquents\PropertiesRepository;
+use App\Repositories\Eloquents\ProvincesRepository;
 use App\Repositories\Eloquents\SpeciesRepository;
 use App\Repositories\Eloquents\UserRepository;
 use App\Repositories\Eloquents\VietnameseProvincesRepository;
+use App\Repositories\Eloquents\WardRepository;
+use App\Repositories\Interfaces\AddresUserRepositoryInterface;
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
+use App\Repositories\Interfaces\DistrictRepositoryInterface;
 use App\Repositories\Interfaces\GallerryRepositoryInterface;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use App\Repositories\Interfaces\PropertiesRepositoryInterface;
+use App\Repositories\Interfaces\ProvincesRepositoryInterface;
 use App\Repositories\Interfaces\SpeciesRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use App\Repositories\Interfaces\VietnameseProvincesInterface;
+use App\Repositories\Interfaces\VietnameseRepositoryProvincesInterface;
+use App\Repositories\Interfaces\WardRepositoryInterface;
 
 trait RepositorySetup
 {
@@ -60,8 +72,20 @@ trait RepositorySetup
             return new UserRepository(new User());
         });
 
-        $this->app->singleton(VietnameseProvincesInterface::class, function () {
-            return new VietnameseProvincesRepository(new AdministrativeRegion());
+        $this->app->singleton(ProvincesRepositoryInterface::class, function () {
+            return new ProvincesRepository(new Provinces());
+        });
+
+        $this->app->singleton(DistrictRepositoryInterface::class, function () {
+            return new DistrictRepository(new District());
+        });
+
+        $this->app->singleton(WardRepositoryInterface::class, function () {
+            return new WardRepository(new Ward());
+        });
+
+        $this->app->singleton(AddresUserRepositoryInterface::class, function () {
+            return new AddresUserRepository(new AddresUser());
         });
     }
 }
