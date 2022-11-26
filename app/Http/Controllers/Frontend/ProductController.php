@@ -15,16 +15,10 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
     use TResponse;
-    private $categoryModel;
-    private $productModel;
     public function __construct(
-        Category $category,
-        Product $product,
         private ProductRepositoryInterface $productRepositoryInterface,
         private CategoryRepositoryInterface $categoryRepositoryInterface
     ) {
-        $this->categoryModel = $category;
-        $this->productModel = $product;
     }
 
     public function getProductNewHome()
@@ -53,14 +47,12 @@ class ProductController extends Controller
         $idcate = $product->categorys->map(function ($value) {
             return $value->id;
         });
-
         $categoryPros = $this->categoryRepositoryInterface->findMany($idcate)->load('products:id');
         foreach ($categoryPros as $catePro) {
             if ($catePro->products)  foreach ($catePro->products as $product) {
                 array_push($proId, $product->id);
             }
         }
-
         $datas = $this->productRepositoryInterface->getExceptInByID($product->id, $proId);
         return $this->sendResponse($datas, trans('message.success'));
     }

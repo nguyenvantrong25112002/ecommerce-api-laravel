@@ -26,4 +26,7 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
     public function whereEmailFirst(string $email);
 
     public function wherePhoneFirst(int $phone);
+
+
+    public function getAuthSanctum();
 }

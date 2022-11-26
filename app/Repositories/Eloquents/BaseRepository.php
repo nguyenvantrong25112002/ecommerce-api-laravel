@@ -74,7 +74,12 @@ class BaseRepository implements BaseRepositoryInterface
 
     public function update(array $condition, array $data)
     {
-        return $this->model->where($condition)->update($data);
+        return $this->model->where(function ($q) use ($condition) {
+            foreach ($condition as $key => $v) {
+                if ($v)  $q->where($key, $v);
+            }
+            return $q;
+        })->update($data);
     }
 
     public function updateById(array $data,  $id)

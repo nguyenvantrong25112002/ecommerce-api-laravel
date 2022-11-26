@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class AdministrativeUnit extends Model
 {
     use HasFactory;
+    protected $connection = 'mysql_2';
     protected $table = "administrative_units";
     protected $primaryKey = "id";
     protected $guarded = [];

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Provinces extends Model
 {
     use HasFactory;
+    protected $connection = 'mysql_2';
     protected $table = "provinces";
     protected $primaryKey = "code";
     protected $guarded = [];

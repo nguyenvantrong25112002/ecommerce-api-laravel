@@ -2,51 +2,49 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Address\CityProvinces;
-use App\Models\Address\District;
 use App\Models\Address\Ward;
 use Illuminate\Http\Request;
+use App\Models\Address\District;
+use App\Models\Address\Provinces;
+use App\Repositories\Interfaces\DistrictRepositoryInterface;
+use App\Repositories\Interfaces\ProvincesRepositoryInterface;
+use App\Repositories\Interfaces\WardRepositoryInterface;
+use App\Services\Traits\TResponse;
 
 class AddressController extends Controller
 {
+    use TResponse;
     protected $cityProvincesModel;
     protected $districtModel;
     protected $wardModel;
-    public function __construct(CityProvinces $cityProvinces, District $district, Ward $ward)
-    {
+    public function __construct(
+        Provinces $cityProvinces,
+        District $district,
+        Ward $ward,
+        private ProvincesRepositoryInterface $provincesRepositoryInterface,
+        private DistrictRepositoryInterface $districtRepositoryInterface,
+        private WardRepositoryInterface $wardRepositoryInterface
+
+    ) {
         $this->cityProvincesModel = $cityProvinces;
         $this->districtModel = $district;
         $this->wardModel = $ward;
     }
-    protected function cityProvincesQuery()
-    {
-        $data = $this->cityProvincesModel::query();
-        return $data;
-    }
+
     public function cityProvincesGet()
     {
-        $data = $this->cityProvincesQuery()->get();
-        return response()->json([
-            'status' => true,
-            'payload' => $data,
-        ]);
+        $datas = $this->provincesRepositoryInterface->getAll();
+        return $this->sendResponse($datas, trans('message.success'));
     }
 
     public function getDistrict(Request $request)
     {
-        // $data = $this->cityProvincesModel::find($request->id)->districts();
-        $data = $this->districtModel::where('city_province_id', $request->id)->get();
-        return response()->json([
-            'status' => true,
-            'payload' => $data,
-        ]);
+        $datas = $this->districtRepositoryInterface->getDistrictFromProvinces($request->code);
+        return $this->sendResponse($datas, trans('message.success'));
     }
     public function getWard(Request $request)
     {
-        $data = $this->wardModel::where('district_id', $request->id)->get();
-        return response()->json([
-            'status' => true,
-            'payload' => $data,
-        ]);
+        $datas = $this->wardRepositoryInterface->getWardFromDistrict($request->code);
+        return $this->sendResponse($datas, trans('message.success'));
     }
 }
